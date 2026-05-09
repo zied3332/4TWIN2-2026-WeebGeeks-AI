@@ -17,6 +17,20 @@ class SimilarityResponse(BaseModel):
     scores: list[float]
 
 
+class ActivityAnalysisRequest(BaseModel):
+    title: str
+    description: str = ""
+    type: str = ""
+    context: str = ""
+    department: str = ""
+    skills: list[str] = []
+
+
+class ActivityAnalysisResponse(BaseModel):
+    activityText: str
+    status: str
+
+
 def cosine_similarity(vec_a, vec_b):
     vec_a = np.array(vec_a)
     vec_b = np.array(vec_b)
@@ -31,6 +45,12 @@ def cosine_similarity(vec_a, vec_b):
 @app.get("/")
 def root():
     return {"message": "HR AI service is running"}
+
+
+@app.post("/analyze-activity", response_model=ActivityAnalysisResponse)
+def analyze_activity(payload: ActivityAnalysisRequest):
+    activity_text = f"{payload.title} {payload.description} {' '.join(payload.skills)}"
+    return {"activityText": activity_text, "status": "ok"}
 
 
 @app.post("/similarity", response_model=SimilarityResponse)
